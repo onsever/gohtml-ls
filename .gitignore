@@ -1,0 +1,12 @@
+gohtml-lsp
+gohtml-lsp.exe
+gohtml-ls
+gohtml-ls.exe
+vscode-extension/bin/
+vscode-extension/node_modules/
+vscode-extension/dist/
+vscode-extension/out/
+vscode-extension/*.vsix
+PLAN.md
+CLAUDE.md
+.DS_Store

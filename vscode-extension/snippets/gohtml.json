@@ -1,0 +1,348 @@
+{
+  "If Block": {
+    "prefix": "if",
+    "body": [
+      "{{if ${1:.Condition}}}",
+      "\t$0",
+      "{{end}}"
+    ],
+    "description": "Go template if block"
+  },
+  "If-Else Block": {
+    "prefix": "ife",
+    "body": [
+      "{{if ${1:.Condition}}}",
+      "\t$2",
+      "{{else}}",
+      "\t$0",
+      "{{end}}"
+    ],
+    "description": "Go template if-else block"
+  },
+  "If-Else If Block": {
+    "prefix": "ifei",
+    "body": [
+      "{{if ${1:.Condition}}}",
+      "\t$2",
+      "{{else if ${3:.OtherCondition}}}",
+      "\t$0",
+      "{{end}}"
+    ],
+    "description": "Go template if-else if block"
+  },
+  "Range Block": {
+    "prefix": "range",
+    "body": [
+      "{{range ${1:.Items}}}",
+      "\t$0",
+      "{{end}}"
+    ],
+    "description": "Go template range loop"
+  },
+  "Range with Index": {
+    "prefix": "rangei",
+    "body": [
+      "{{range $$${1:index}, $$${2:item} := ${3:.Items}}}",
+      "\t$0",
+      "{{end}}"
+    ],
+    "description": "Go template range loop with index variable"
+  },
+  "Range-Else Block": {
+    "prefix": "rangee",
+    "body": [
+      "{{range ${1:.Items}}}",
+      "\t$2",
+      "{{else}}",
+      "\t<p>No items found.</p>$0",
+      "{{end}}"
+    ],
+    "description": "Go template range loop with else (empty collection)"
+  },
+  "With Block": {
+    "prefix": "with",
+    "body": [
+      "{{with ${1:.Value}}}",
+      "\t$0",
+      "{{end}}"
+    ],
+    "description": "Go template with block"
+  },
+  "With-Else Block": {
+    "prefix": "withe",
+    "body": [
+      "{{with ${1:.Value}}}",
+      "\t$2",
+      "{{else}}",
+      "\t$0",
+      "{{end}}"
+    ],
+    "description": "Go template with block with else fallback"
+  },
+  "Define Block": {
+    "prefix": "define",
+    "body": [
+      "{{define \"${1:name}\"}}",
+      "\t$0",
+      "{{end}}"
+    ],
+    "description": "Go template define block"
+  },
+  "Block": {
+    "prefix": "block",
+    "body": [
+      "{{block \"${1:name}\" ${2:.}}}",
+      "\t$0",
+      "{{end}}"
+    ],
+    "description": "Go template block (define with default content)"
+  },
+  "Template Call": {
+    "prefix": "template",
+    "body": "{{template \"${1:name}\" ${2:.}}}",
+    "description": "Go template call"
+  },
+  "Comment": {
+    "prefix": "comment",
+    "body": "{{/* ${1:comment} */}}",
+    "description": "Go template comment"
+  },
+  "Multiline Comment": {
+    "prefix": "commentml",
+    "body": [
+      "{{/*",
+      "\t$0",
+      "*/}}"
+    ],
+    "description": "Go template multiline comment"
+  },
+  "Variable Declaration": {
+    "prefix": "var",
+    "body": "{{$$${1:name} := ${2:.Value}}}",
+    "description": "Go template variable declaration"
+  },
+  "Variable Assignment": {
+    "prefix": "set",
+    "body": "{{$$${1:name} = ${2:.Value}}}",
+    "description": "Go template variable reassignment"
+  },
+  "Print Field": {
+    "prefix": ".",
+    "body": "{{.${1:Field}}}",
+    "description": "Print a field from dot context"
+  },
+  "Print Variable": {
+    "prefix": "$",
+    "body": "{{$$${1:var}}}",
+    "description": "Print a template variable"
+  },
+  "Printf": {
+    "prefix": "printf",
+    "body": "{{printf \"${1:%s}\" ${2:.Value}}}",
+    "description": "Formatted print"
+  },
+  "Trim Whitespace Action": {
+    "prefix": "trim",
+    "body": "{{- ${1:.Value} -}}",
+    "description": "Action with whitespace trimming on both sides"
+  },
+  "Pipe to Function": {
+    "prefix": "pipe",
+    "body": "{{${1:.Value} | ${2:func}}}",
+    "description": "Pipeline: pipe a value into a function"
+  },
+  "Len": {
+    "prefix": "len",
+    "body": "{{len ${1:.Items}}}",
+    "description": "Length of collection"
+  },
+  "Index": {
+    "prefix": "index",
+    "body": "{{index ${1:.Items} ${2:0}}}",
+    "description": "Index into a collection"
+  },
+  "Eq Comparison": {
+    "prefix": "eq",
+    "body": "{{if eq ${1:.Value} ${2:\"expected\"}}}$0{{end}}",
+    "description": "Equality check"
+  },
+  "Ne Comparison": {
+    "prefix": "ne",
+    "body": "{{if ne ${1:.Value} ${2:\"unexpected\"}}}$0{{end}}",
+    "description": "Not-equal check"
+  },
+  "Not": {
+    "prefix": "not",
+    "body": "{{if not ${1:.Value}}}$0{{end}}",
+    "description": "Negation check"
+  },
+  "And": {
+    "prefix": "and",
+    "body": "{{if and ${1:.A} ${2:.B}}}$0{{end}}",
+    "description": "Logical AND"
+  },
+  "Or": {
+    "prefix": "or",
+    "body": "{{if or ${1:.A} ${2:.B}}}$0{{end}}",
+    "description": "Logical OR"
+  },
+  "HTML Page Scaffold": {
+    "prefix": "gohtml-page",
+    "body": [
+      "<!DOCTYPE html>",
+      "<html lang=\"${1:en}\">",
+      "<head>",
+      "\t<meta charset=\"UTF-8\">",
+      "\t<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">",
+      "\t<title>{{.${2:Title}}}</title>",
+      "</head>",
+      "<body>",
+      "\t$0",
+      "</body>",
+      "</html>"
+    ],
+    "description": "Full HTML page scaffold with Go template fields"
+  },
+  "Base Layout": {
+    "prefix": "gohtml-layout",
+    "body": [
+      "<!DOCTYPE html>",
+      "<html lang=\"${1:en}\">",
+      "<head>",
+      "\t<meta charset=\"UTF-8\">",
+      "\t<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">",
+      "\t<title>{{block \"title\" .}}${2:Default Title}{{end}}</title>",
+      "\t{{block \"head\" .}}{{end}}",
+      "</head>",
+      "<body>",
+      "\t{{block \"nav\" .}}{{end}}",
+      "\t<main>",
+      "\t\t{{block \"content\" .}}{{end}}",
+      "\t</main>",
+      "\t{{block \"footer\" .}}",
+      "\t<footer>$0</footer>",
+      "\t{{end}}",
+      "\t{{block \"scripts\" .}}{{end}}",
+      "</body>",
+      "</html>"
+    ],
+    "description": "Base layout template with block placeholders"
+  },
+  "Child Template": {
+    "prefix": "gohtml-child",
+    "body": [
+      "{{define \"${1:content}\"}}",
+      "\t$0",
+      "{{end}}"
+    ],
+    "description": "Child template that defines a block from a layout"
+  },
+  "Partial Template": {
+    "prefix": "gohtml-partial",
+    "body": [
+      "{{define \"${1:partials/name}\"}}",
+      "<div class=\"${2:component}\">",
+      "\t$0",
+      "</div>",
+      "{{end}}"
+    ],
+    "description": "Reusable partial template"
+  },
+  "Form": {
+    "prefix": "gohtml-form",
+    "body": [
+      "<form action=\"{{.${1:Action}}}\" method=\"${2|POST,GET|}\">",
+      "\t$0",
+      "\t<button type=\"submit\">${3:Submit}</button>",
+      "</form>"
+    ],
+    "description": "HTML form with Go template action"
+  },
+  "Link": {
+    "prefix": "gohtml-a",
+    "body": "<a href=\"{{.${1:URL}}}\">{{.${2:Text}}}</a>",
+    "description": "Anchor tag with template fields"
+  },
+  "Image": {
+    "prefix": "gohtml-img",
+    "body": "<img src=\"{{.${1:ImageURL}}}\" alt=\"{{.${2:AltText}}}\">",
+    "description": "Image tag with template fields"
+  },
+  "Conditional CSS Class": {
+    "prefix": "gohtml-class",
+    "body": "class=\"{{if ${1:.IsActive}}}${2:active}{{else}}${3:inactive}{{end}}\"",
+    "description": "Conditional CSS class using template"
+  },
+  "Select Dropdown": {
+    "prefix": "gohtml-select",
+    "body": [
+      "<select name=\"${1:field}\">",
+      "\t{{range .${2:Options}}}",
+      "\t<option value=\"{{.${3:Value}}}\"{{if eq .${3:Value} $$${4:selected}}} selected{{end}}>{{.${5:Label}}}</option>",
+      "\t{{end}}",
+      "</select>"
+    ],
+    "description": "Select dropdown populated from template data"
+  },
+  "Table from Slice": {
+    "prefix": "gohtml-table",
+    "body": [
+      "<table>",
+      "\t<thead>",
+      "\t\t<tr>",
+      "\t\t\t<th>${1:Column}</th>",
+      "\t\t</tr>",
+      "\t</thead>",
+      "\t<tbody>",
+      "\t\t{{range .${2:Items}}}",
+      "\t\t<tr>",
+      "\t\t\t<td>{{.${3:Field}}}</td>",
+      "\t\t</tr>",
+      "\t\t{{end}}",
+      "\t</tbody>",
+      "</table>"
+    ],
+    "description": "HTML table generated from a slice"
+  },
+  "Error Display": {
+    "prefix": "gohtml-error",
+    "body": [
+      "{{if .${1:Errors}}}",
+      "<div class=\"errors\">",
+      "\t<ul>",
+      "\t{{range .${1:Errors}}}",
+      "\t\t<li>{{.}}</li>",
+      "\t{{end}}",
+      "\t</ul>",
+      "</div>",
+      "{{end}}"
+    ],
+    "description": "Error message display block"
+  },
+  "Flash Message": {
+    "prefix": "gohtml-flash",
+    "body": [
+      "{{with .${1:Flash}}}",
+      "<div class=\"alert alert-{{.${2:Type}}}\">",
+      "\t{{.${3:Message}}}",
+      "</div>",
+      "{{end}}"
+    ],
+    "description": "Flash/alert message display"
+  },
+  "Pagination": {
+    "prefix": "gohtml-pagination",
+    "body": [
+      "<nav class=\"pagination\">",
+      "\t{{if .${1:HasPrev}}}",
+      "\t<a href=\"?page={{.${2:PrevPage}}}\">&laquo; Previous</a>",
+      "\t{{end}}",
+      "\t<span>Page {{.${3:CurrentPage}}} of {{.${4:TotalPages}}}</span>",
+      "\t{{if .${5:HasNext}}}",
+      "\t<a href=\"?page={{.${6:NextPage}}}\">Next &raquo;</a>",
+      "\t{{end}}",
+      "</nav>"
+    ],
+    "description": "Pagination navigation"
+  }
+}

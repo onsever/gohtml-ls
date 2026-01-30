@@ -1,0 +1,163 @@
+{
+  "name": "gohtml-lsp",
+  "displayName": "Go HTML Template",
+  "description": "Language support for Go html/template files — syntax highlighting, completions, hover, go-to-definition, diagnostics, and more.",
+  "version": "0.1.0",
+  "publisher": "onurcansever",
+  "license": "MIT",
+  "icon": "icon.png",
+  "engines": {
+    "vscode": "^1.75.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Linters",
+    "Snippets"
+  ],
+  "keywords": [
+    "go",
+    "golang",
+    "template",
+    "html/template",
+    "gohtml"
+  ],
+  "activationEvents": [
+    "onLanguage:gohtml"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "languages": [
+      {
+        "id": "gohtml",
+        "aliases": [
+          "Go HTML Template",
+          "gohtml"
+        ],
+        "extensions": [
+          ".gohtml",
+          ".gotmpl",
+          ".tmpl",
+          ".tpl"
+        ],
+        "configuration": "./language-configuration.json",
+        "icon": {
+          "light": "./icons/gohtml.svg",
+          "dark": "./icons/gohtml.svg"
+        }
+      }
+    ],
+    "semanticTokenScopes": [
+      {
+        "language": "gohtml",
+        "scopes": {
+          "function": ["entity.name.function.call.gotemplate"],
+          "function.defaultLibrary": ["support.function.builtin.gotemplate"],
+          "keyword": ["keyword.control.gotemplate"],
+          "variable": ["variable.other.gotemplate"],
+          "property": ["variable.other.property.gotemplate"],
+          "string": ["string.quoted.double.gotemplate"],
+          "string.declaration": ["entity.name.function.gotemplate"],
+          "comment": ["comment.block.gotemplate"],
+          "operator": ["keyword.operator.pipe.gotemplate"],
+          "number": ["constant.numeric.gotemplate"]
+        }
+      }
+    ],
+    "grammars": [
+      {
+        "language": "gohtml",
+        "scopeName": "text.html.gotemplate",
+        "path": "./syntaxes/gohtml.tmLanguage.json",
+        "embeddedLanguages": {
+          "source.go.template": "go",
+          "text.html.basic": "html"
+        },
+        "tokenTypes": {
+          "punctuation.definition.tag.begin.gotemplate": "other",
+          "punctuation.definition.tag.end.gotemplate": "other"
+        }
+      },
+      {
+        "scopeName": "source.go.template.injection",
+        "path": "./syntaxes/gohtml-injection.tmLanguage.json",
+        "injectTo": [
+          "text.html.basic"
+        ],
+        "embeddedLanguages": {
+          "source.go.template": "go"
+        }
+      }
+    ],
+    "snippets": [
+      {
+        "language": "gohtml",
+        "path": "./snippets/gohtml.json"
+      }
+    ],
+    "configurationDefaults": {
+      "[gohtml]": {
+        "editor.semanticHighlighting.enabled": true
+      },
+      "editor.semanticTokenColorCustomizations": {
+        "[*]": {
+          "rules": {
+            "function.defaultLibrary:gohtml": {
+              "foreground": "#4EC9B0",
+              "bold": true
+            },
+            "function:gohtml": {
+              "foreground": "#DCDCAA"
+            }
+          }
+        }
+      }
+    },
+    "configuration": {
+      "title": "Go HTML Template",
+      "properties": {
+        "gohtml-lsp.serverPath": {
+          "type": "string",
+          "default": "",
+          "description": "Path to the gohtml-lsp binary. If empty, uses 'gohtml-lsp' from PATH."
+        },
+        "gohtml-lsp.staticRoot": {
+          "type": "string",
+          "default": "",
+          "description": "Path to the static assets directory (e.g., \"./static\" or \"./public\"). Enables path completions inside src, href, and action attributes."
+        },
+        "gohtml-lsp.trace.server": {
+          "type": "string",
+          "enum": [
+            "off",
+            "messages",
+            "verbose"
+          ],
+          "default": "off",
+          "description": "Trace communication between VS Code and the language server."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run esbuild",
+    "esbuild": "esbuild ./src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node --sourcemap --main-fields=module,main",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "package": "vsce package --no-dependencies"
+  },
+  "dependencies": {
+    "vscode-html-languageservice": "^5.3.0",
+    "vscode-languageclient": "^9.0.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/onsever/gohtml-ls.git"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/vscode": "^1.75.0",
+    "@vscode/vsce": "^3.0.0",
+    "esbuild": "^0.27.2",
+    "typescript": "^5.3.0"
+  }
+}
