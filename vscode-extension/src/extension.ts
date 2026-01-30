@@ -112,7 +112,7 @@ export function activate(context: ExtensionContext): void {
   }
 
   const outputChannel = window.createOutputChannel(
-    "Go HTML Template LSP",
+    "Go HTML Language Server",
     { log: true }
   );
   outputChannel.appendLine(`Starting gohtml-lsp from: ${serverPath}`);
@@ -146,7 +146,7 @@ export function activate(context: ExtensionContext): void {
 
   client = new LanguageClient(
     "gohtml-lsp",
-    "Go HTML Template LSP",
+    "Go HTML Language Server",
     serverOptions,
     clientOptions
   );
@@ -155,7 +155,7 @@ export function activate(context: ExtensionContext): void {
     outputChannel.appendLine("gohtml-lsp started successfully.");
   }).catch((err) => {
     const msg =
-      `Failed to start Go HTML Template LSP: ${err.message}. ` +
+      `Failed to start Go HTML Language Server: ${err.message}. ` +
       `Binary path: ${serverPath}. ` +
       `Set gohtml-lsp.serverPath in settings if needed.`;
     outputChannel.appendLine(msg);

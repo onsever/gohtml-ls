@@ -1,4 +1,4 @@
-# Go HTML Template
+# Go HTML Language Server
 
 Full language support for Go `html/template` and `text/template` files in VS Code.
 

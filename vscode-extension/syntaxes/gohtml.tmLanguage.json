@@ -1,6 +1,6 @@
 {
   "scopeName": "text.html.gotemplate",
-  "name": "Go HTML Template",
+  "name": "Go HTML Language Server",
   "patterns": [
     { "include": "#go-template" },
     { "include": "text.html.basic" }

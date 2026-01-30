@@ -1,9 +1,9 @@
 {
   "name": "gohtml-lsp",
-  "displayName": "Go HTML Template",
+  "displayName": "Go HTML Language Server",
   "description": "Language support for Go html/template files — syntax highlighting, completions, hover, go-to-definition, diagnostics, and more.",
   "version": "0.1.0",
-  "publisher": "onurcansever",
+  "publisher": "onsever",
   "license": "MIT",
   "icon": "icon.png",
   "engines": {
@@ -30,7 +30,7 @@
       {
         "id": "gohtml",
         "aliases": [
-          "Go HTML Template",
+          "Go HTML Language Server",
           "gohtml"
         ],
         "extensions": [
@@ -113,7 +113,7 @@
       }
     },
     "configuration": {
-      "title": "Go HTML Template",
+      "title": "Go HTML Language Server",
       "properties": {
         "gohtml-lsp.serverPath": {
           "type": "string",
