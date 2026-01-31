@@ -448,10 +448,18 @@ func derefType(t types.Type) types.Type {
 // resolveDataTypeViaTypes resolves the data expression's type using go/types.
 func resolveDataTypeViaTypes(expr ast.Expr, tp *TypedPackage, fset *token.FileSet) *TypeInfo {
 	tv, ok := tp.Info.Types[expr]
-	if !ok {
-		return nil
+	if ok {
+		return convertToTypeInfo(tv.Type, fset, 0)
 	}
-	return convertToTypeInfo(tv.Type, fset, 0)
+	// Info.Types excludes identifiers denoting declared objects (variables,
+	// parameters, etc.). Fall back to Info.Uses / Info.ObjectOf.
+	if ident, ok := expr.(*ast.Ident); ok {
+		obj := tp.Info.ObjectOf(ident)
+		if obj != nil {
+			return convertToTypeInfo(obj.Type(), fset, 0)
+		}
+	}
+	return nil
 }
 
 // convertToTypeInfo converts a go/types.Type to our TypeInfo structure.
