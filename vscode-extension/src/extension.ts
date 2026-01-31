@@ -1,4 +1,4 @@
-import { existsSync, readdirSync, statSync } from "fs";
+import { chmodSync, existsSync, readdirSync, statSync } from "fs";
 import * as path from "path";
 import {
   workspace,
@@ -104,6 +104,10 @@ export function activate(context: ExtensionContext): void {
 
     const bundled = context.asAbsolutePath(`bin/${binaryName}`);
     if (existsSync(bundled)) {
+      // Ensure the binary is executable on Linux/macOS (.vsix packaging can strip permissions)
+      if (process.platform !== "win32") {
+        try { chmodSync(bundled, 0o755); } catch { /* ignore */ }
+      }
       serverPath = bundled;
     } else {
       // Fall back to PATH
