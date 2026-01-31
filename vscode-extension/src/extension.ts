@@ -117,9 +117,25 @@ export function activate(context: ExtensionContext): void {
   );
   outputChannel.appendLine(`Starting gohtml-lsp from: ${serverPath}`);
 
+  // Ensure the LSP child process can find `go` on Linux/macOS.
+  // Snap, Homebrew, and manual installs place the binary in paths
+  // that VS Code may not inherit.
+  const extraPaths = [
+    "/snap/bin",
+    "/usr/local/go/bin",
+    "/usr/local/bin",
+    path.join(process.env.HOME || "", "go/bin"),
+    path.join(process.env.HOME || "", ".local/bin"),
+  ];
+  const envPATH = process.env.PATH || "";
+  const augmentedPATH = [...extraPaths, envPATH].join(path.delimiter);
+
   const run: Executable = {
     command: serverPath,
     transport: TransportKind.stdio,
+    options: {
+      env: { ...process.env, PATH: augmentedPATH },
+    },
   };
 
   const serverOptions: ServerOptions = {
