@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"go/ast"
+	"go/build"
 	"go/importer"
 	"go/parser"
 	"go/token"
@@ -169,6 +170,7 @@ func ensureGOROOT() {
 		goroot := strings.TrimSpace(string(out))
 		if goroot != "" {
 			os.Setenv("GOROOT", goroot)
+			build.Default.GOROOT = goroot
 			fmt.Fprintf(os.Stderr, "[gohtml-lsp] set GOROOT=%s (cross-compiled binary fix)\n", goroot)
 		}
 	})

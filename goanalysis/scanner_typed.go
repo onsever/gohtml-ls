@@ -1,9 +1,11 @@
 package goanalysis
 
 import (
+	"fmt"
 	"go/ast"
 	"go/token"
 	"go/types"
+	"os"
 	"path/filepath"
 	"strings"
 )
@@ -13,7 +15,12 @@ import (
 func ScanDirectoryTyped(dir string) []TemplateBinding {
 	lr := LoadDirectory(dir)
 	if lr == nil {
+		fmt.Fprintf(os.Stderr, "[gohtml-lsp] ScanDirectoryTyped: LoadDirectory returned nil\n")
 		return nil
+	}
+	fmt.Fprintf(os.Stderr, "[gohtml-lsp] ScanDirectoryTyped: loaded %d packages\n", len(lr.Packages))
+	for path, tp := range lr.Packages {
+		fmt.Fprintf(os.Stderr, "[gohtml-lsp]   pkg=%s files=%d typed=%v\n", path, len(tp.Files), tp.Pkg != nil)
 	}
 
 	var bindings []TemplateBinding

@@ -2,7 +2,7 @@
   "name": "gohtml-lsp",
   "displayName": "Go HTML Language Server",
   "description": "Language support for Go html/template files — syntax highlighting, completions, hover, go-to-definition, diagnostics, and more.",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "publisher": "onsever",
   "license": "MIT",
   "icon": "icon.png",
@@ -50,16 +50,36 @@
       {
         "language": "gohtml",
         "scopes": {
-          "function": ["entity.name.function.call.gotemplate"],
-          "function.defaultLibrary": ["support.function.builtin.gotemplate"],
-          "keyword": ["keyword.control.gotemplate"],
-          "variable": ["variable.other.gotemplate"],
-          "property": ["variable.other.property.gotemplate"],
-          "string": ["string.quoted.double.gotemplate"],
-          "string.declaration": ["entity.name.function.gotemplate"],
-          "comment": ["comment.block.gotemplate"],
-          "operator": ["keyword.operator.pipe.gotemplate"],
-          "number": ["constant.numeric.gotemplate"]
+          "function": [
+            "entity.name.function.call.gotemplate"
+          ],
+          "function.defaultLibrary": [
+            "support.function.builtin.gotemplate"
+          ],
+          "keyword": [
+            "keyword.control.gotemplate"
+          ],
+          "variable": [
+            "variable.other.gotemplate"
+          ],
+          "property": [
+            "variable.other.property.gotemplate"
+          ],
+          "string": [
+            "string.quoted.double.gotemplate"
+          ],
+          "string.declaration": [
+            "entity.name.function.gotemplate"
+          ],
+          "comment": [
+            "comment.block.gotemplate"
+          ],
+          "operator": [
+            "keyword.operator.pipe.gotemplate"
+          ],
+          "number": [
+            "constant.numeric.gotemplate"
+          ]
         }
       }
     ],
