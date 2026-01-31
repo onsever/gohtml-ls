@@ -2,7 +2,7 @@
   "name": "gohtml-lsp",
   "displayName": "Go HTML Language Server",
   "description": "Language support for Go html/template files — syntax highlighting, completions, hover, go-to-definition, diagnostics, and more.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "publisher": "onsever",
   "license": "MIT",
   "icon": "icon.png",
