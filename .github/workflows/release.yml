@@ -16,8 +16,9 @@ jobs:
             binary: gohtml-lsp-linux-arm64
           - runner: macos-latest
             binary: gohtml-lsp-darwin-arm64
-          - runner: macos-15-large
+          - runner: macos-latest
             binary: gohtml-lsp-darwin-amd64
+            goarch: amd64
           - runner: windows-latest
             binary: gohtml-lsp-windows-amd64.exe
     runs-on: ${{ matrix.runner }}
@@ -33,6 +34,8 @@ jobs:
 
       - name: Build binary
         run: go build -o ${{ matrix.binary }} .
+        env:
+          GOARCH: ${{ matrix.goarch }}
 
       - uses: actions/upload-artifact@v4
         with:
