@@ -16,7 +16,7 @@ jobs:
             binary: gohtml-lsp-linux-arm64
           - runner: macos-latest
             binary: gohtml-lsp-darwin-arm64
-          - runner: macos-13
+          - runner: macos-15-large
             binary: gohtml-lsp-darwin-amd64
           - runner: windows-latest
             binary: gohtml-lsp-windows-amd64.exe
