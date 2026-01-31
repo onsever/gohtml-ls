@@ -322,6 +322,14 @@ func (s *Server) RegisterFileWatchers() {
 	_ = s.transport.WriteMessage(data)
 }
 
+// LogMessage sends a window/logMessage notification to the client.
+func (s *Server) LogMessage(msgType int, message string) {
+	s.Notify("window/logMessage", map[string]interface{}{
+		"type":    msgType,
+		"message": message,
+	})
+}
+
 // Notify sends a notification to the client.
 func (s *Server) Notify(method string, params interface{}) {
 	notif, err := jsonrpc.NewNotification(method, params)

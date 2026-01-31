@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"strings"
 
@@ -43,6 +44,21 @@ func (h *handler) Initialize(params lsp.InitializeParams) (lsp.InitializeResult,
 		// Register file watchers for .go files
 		if h.server != nil {
 			h.server.RegisterFileWatchers()
+		}
+		// Debug: log binding info
+		if h.server != nil {
+			h.server.LogMessage(3, fmt.Sprintf("[debug] root=%s bindings=%d", h.ws.RootPath, len(h.bindings)))
+			for i, b := range h.bindings {
+				dt := "<nil>"
+				if b.DataType != nil {
+					dt = b.DataType.Name
+					if dt == "" {
+						dt = fmt.Sprintf("{fields:%d}", len(b.DataType.Fields))
+					}
+				}
+				h.server.LogMessage(3, fmt.Sprintf("[debug] binding[%d] tmpl=%q data=%s files=%v handler=%s gofile=%s",
+					i, b.TemplateName, dt, b.ParsedFiles, b.HandlerName, b.GoFile))
+			}
 		}
 		close(h.initDone)
 		// Re-publish diagnostics for all open documents now that bindings are ready

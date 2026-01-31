@@ -11,7 +11,9 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 	"strings"
+	"sync"
 )
 
 // LoadResult holds type-checked packages from a Go project directory.
@@ -78,7 +80,7 @@ func LoadDirectory(dir string) *LoadResult {
 	localImporter := &localPkgImporter{
 		result:   result,
 		fset:     fset,
-		fallback: importer.Default(),
+		fallback: defaultImporter(),
 	}
 
 	// Type-check each package (the importer handles dependency ordering)
@@ -134,6 +136,42 @@ func (i *localPkgImporter) ensureChecked(path string) (*types.Package, error) {
 		tp.Pkg = pkg
 	}
 	return pkg, nil
+}
+
+// defaultImporter returns a gc importer that works correctly even when
+// the binary was cross-compiled. Cross-compiled binaries embed the build
+// host's GOROOT, which doesn't exist on the target machine, causing
+// importer.Default() to fail silently. We detect the real GOROOT via
+// `go env GOROOT` and set it in the environment before creating the importer.
+func defaultImporter() types.Importer {
+	ensureGOROOT()
+	return importer.Default()
+}
+
+var ensureGOROOTOnce sync.Once
+
+func ensureGOROOT() {
+	ensureGOROOTOnce.Do(func() {
+		// If GOROOT is already set in env or runtime.GOROOT() points to a valid path, skip.
+		if gr := os.Getenv("GOROOT"); gr != "" {
+			return
+		}
+		if gr := runtime.GOROOT(); gr != "" {
+			if _, err := os.Stat(filepath.Join(gr, "src", "runtime")); err == nil {
+				return
+			}
+		}
+		// runtime.GOROOT() is stale (cross-compiled binary). Detect from `go env`.
+		out, err := exec.Command("go", "env", "GOROOT").Output()
+		if err != nil {
+			return
+		}
+		goroot := strings.TrimSpace(string(out))
+		if goroot != "" {
+			os.Setenv("GOROOT", goroot)
+			fmt.Fprintf(os.Stderr, "[gohtml-lsp] set GOROOT=%s (cross-compiled binary fix)\n", goroot)
+		}
+	})
 }
 
 // goList runs `go list -json ./...` in dir and returns package info.

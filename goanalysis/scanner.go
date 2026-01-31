@@ -6,6 +6,7 @@ import (
 	"go/parser"
 	"go/token"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 )
@@ -25,7 +26,21 @@ type TemplateBinding struct {
 // falling back to the AST-only scanner if type-checking fails.
 func ScanDirectory(dir string) []TemplateBinding {
 	if bindings := ScanDirectoryTyped(dir); bindings != nil {
+		fmt.Fprintf(os.Stderr, "[gohtml-lsp] ScanDirectory: typed scanner returned %d bindings\n", len(bindings))
 		return bindings
+	}
+	fmt.Fprintf(os.Stderr, "[gohtml-lsp] ScanDirectory: typed scanner failed, falling back to AST scanner\n")
+	// Log why typed scanner failed
+	if lr := LoadDirectory(dir); lr == nil {
+		// Try go list directly to capture error
+		cmd := exec.Command("go", "list", "-json", "./...")
+		cmd.Dir = dir
+		cmd.Env = append(os.Environ(), "GOFLAGS=-mod=mod")
+		if out, err := cmd.CombinedOutput(); err != nil {
+			fmt.Fprintf(os.Stderr, "[gohtml-lsp] go list error: %v\noutput: %s\n", err, string(out[:min(len(out), 500)]))
+		} else {
+			fmt.Fprintf(os.Stderr, "[gohtml-lsp] go list succeeded but LoadDirectory returned nil\n")
+		}
 	}
 	return scanDirectoryAST(dir)
 }
