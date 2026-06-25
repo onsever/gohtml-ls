@@ -27,7 +27,7 @@ func NewTemplateIndex() *TemplateIndex {
 
 // Index indexes a parsed template, recording definitions and references.
 func (idx *TemplateIndex) Index(pt *ParsedTemplate) {
-	idx.removeURI(pt.URI)
+	idx.RemoveURI(pt.URI)
 	idx.Trees[pt.URI] = pt
 
 	if pt.Trees == nil {
@@ -117,7 +117,8 @@ func walkBranchRefs(n *parse.BranchNode, pt *ParsedTemplate, idx *TemplateIndex)
 	}
 }
 
-func (idx *TemplateIndex) removeURI(uri string) {
+// RemoveURI removes all index entries for a template URI.
+func (idx *TemplateIndex) RemoveURI(uri string) {
 	delete(idx.Trees, uri)
 	removeURIFromMap(idx.Definitions, uri)
 	removeURIFromMap(idx.References, uri)

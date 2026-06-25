@@ -63,6 +63,12 @@ func (pt *ParsedTemplate) OffsetToPosition(offset int) lsp.Position {
 	if len(pt.Lines) == 0 {
 		return lsp.Position{}
 	}
+	if offset < 0 {
+		offset = 0
+	}
+	if offset > len(pt.Content) {
+		offset = len(pt.Content)
+	}
 	line := 0
 	for i, lo := range pt.Lines {
 		if lo > offset {
@@ -70,7 +76,7 @@ func (pt *ParsedTemplate) OffsetToPosition(offset int) lsp.Position {
 		}
 		line = i
 	}
-	col := offset - pt.Lines[line]
+	col := utf16CodeUnits(pt.Content[pt.Lines[line]:offset])
 	return lsp.Position{Line: uint32(line), Character: uint32(col)}
 }
 
@@ -79,7 +85,12 @@ func (pt *ParsedTemplate) PositionToOffset(pos lsp.Position) int {
 	if int(pos.Line) >= len(pt.Lines) {
 		return len(pt.Content)
 	}
-	return pt.Lines[pos.Line] + int(pos.Character)
+	lineStart := pt.Lines[pos.Line]
+	lineEnd := len(pt.Content)
+	if int(pos.Line)+1 < len(pt.Lines) {
+		lineEnd = pt.Lines[pos.Line+1] - 1
+	}
+	return utf16PositionToOffset(pt.Content, lineStart, lineEnd, int(pos.Character))
 }
 
 func computeLineOffsets(content string) []int {
@@ -90,6 +101,39 @@ func computeLineOffsets(content string) []int {
 		}
 	}
 	return offsets
+}
+
+func utf16CodeUnits(s string) int {
+	units := 0
+	for _, r := range s {
+		if r > 0xFFFF {
+			units += 2
+		} else {
+			units++
+		}
+	}
+	return units
+}
+
+func utf16PositionToOffset(content string, start, end, targetUnits int) int {
+	if targetUnits <= 0 {
+		return start
+	}
+	units := 0
+	for rel, r := range content[start:end] {
+		next := units + 1
+		if r > 0xFFFF {
+			next = units + 2
+		}
+		if next > targetUnits {
+			return start + rel
+		}
+		if next == targetUnits {
+			return start + rel + len(string(r))
+		}
+		units = next
+	}
+	return end
 }
 
 // NodeAtOffset finds the innermost node at the given byte offset.
@@ -193,9 +237,9 @@ func findNodeAtOffset(node parse.Node, offset int, content string) parse.Node {
 // ScopeChain represents the chain of range/with scopes enclosing a given offset.
 // Each entry is a FieldNode from the pipe of a range/with, outermost first.
 type ScopeEntry struct {
-	Kind  string          // "range" or "with"
+	Kind  string           // "range" or "with"
 	Field *parse.FieldNode // the field being ranged/withed
-	Vars  []string        // variable names declared in the pipe (e.g., "$i", "$v" from range)
+	Vars  []string         // variable names declared in the pipe (e.g., "$i", "$v" from range)
 }
 
 // ScopeAtOffset returns the chain of range/with scopes enclosing the given offset.

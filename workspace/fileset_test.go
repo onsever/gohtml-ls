@@ -49,6 +49,19 @@ func TestPathToURI(t *testing.T) {
 	}
 }
 
+func TestPathToURI_EscapesSpecialCharacters(t *testing.T) {
+	uri := PathToURI("/home/user/my templates/a #1.gohtml")
+	if strings.Contains(uri, " ") {
+		t.Fatalf("expected URI to escape spaces, got %q", uri)
+	}
+	if strings.Contains(uri, "#1") {
+		t.Fatalf("expected URI to escape fragment marker, got %q", uri)
+	}
+	if got := URIToPath(uri); got != "/home/user/my templates/a #1.gohtml" {
+		t.Fatalf("expected URIToPath to round-trip escaped URI, got %q", got)
+	}
+}
+
 func TestIsTemplateFile(t *testing.T) {
 	tests := []struct {
 		path string

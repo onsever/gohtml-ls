@@ -116,6 +116,28 @@ func TestComputeDiagnostics_ValidField(t *testing.T) {
 	}
 }
 
+func TestComputeDiagnostics_UsesParseGlobBinding(t *testing.T) {
+	pt, idx := setupTemplate("file:///project/templates/page.gohtml", `{{.Missing}}`)
+	ti := goanalysis.NewTypeInfo("PageData", "")
+	ti.Fields["Title"] = goanalysis.FieldInfo{Name: "Title", TypeName: "string"}
+	bindings := []goanalysis.TemplateBinding{
+		{
+			TemplateName: "*.gohtml",
+			ParsedFiles:  []string{"templates/*.gohtml"},
+			DataType:     ti,
+			FuncMaps:     map[string]goanalysis.FuncSig{},
+		},
+	}
+
+	diags := ComputeDiagnostics(pt, idx, bindings)
+	if len(diags) != 1 {
+		t.Fatalf("expected one diagnostic from glob binding, got %d: %#v", len(diags), diags)
+	}
+	if !strings.Contains(diags[0].Message, "Missing") {
+		t.Fatalf("expected missing field diagnostic, got %q", diags[0].Message)
+	}
+}
+
 func TestComputeDiagnostics_MultipleUndefinedFields(t *testing.T) {
 	pt, idx := setupTemplate("file:///test.gohtml", `{{.Foo}} {{.Bar}} {{.Username}}`)
 	bindings := makeBindings("HomeData", map[string]string{

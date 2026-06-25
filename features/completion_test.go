@@ -114,3 +114,33 @@ func TestCompletion_FieldCompletionsNoBindings(t *testing.T) {
 		t.Errorf("expected 0 field completions with no bindings, got %d", len(result.Items))
 	}
 }
+
+func TestCompletion_FieldCompletionsForParseGlobBinding(t *testing.T) {
+	ti := goanalysis.NewTypeInfo("PageData", "")
+	ti.Fields["Title"] = goanalysis.FieldInfo{Name: "Title", TypeName: "string"}
+
+	pt := tmpl.Parse("file:///project/templates/page.gohtml", `{{.`)
+	idx := tmpl.NewTemplateIndex()
+	bindings := []goanalysis.TemplateBinding{
+		{
+			TemplateName: "*.gohtml",
+			ParsedFiles:  []string{"templates/*.gohtml"},
+			DataType:     ti,
+			FuncMaps:     map[string]goanalysis.FuncSig{},
+		},
+	}
+
+	result := Completion(pt, lsp.Position{Line: 0, Character: 3}, idx, bindings)
+	if !hasCompletionLabel(result.Items, "Title") {
+		t.Fatalf("expected glob binding to provide Title completion, got %#v", result.Items)
+	}
+}
+
+func hasCompletionLabel(items []lsp.CompletionItem, label string) bool {
+	for _, item := range items {
+		if item.Label == label {
+			return true
+		}
+	}
+	return false
+}

@@ -47,6 +47,37 @@ func TestScanTemplates(t *testing.T) {
 	}
 }
 
+func TestReindexFile_RemovesMissingTemplate(t *testing.T) {
+	dir := t.TempDir()
+	tmplPath := filepath.Join(dir, "gone.gohtml")
+	if err := os.WriteFile(tmplPath, []byte(`{{define "gone"}}x{{end}}`), 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	ws := NewWorkspace(PathToURI(dir))
+	ws.ScanTemplates()
+
+	uri := PathToURI(tmplPath)
+	if _, ok := ws.Index.Trees[uri]; !ok {
+		t.Fatalf("expected %q to be indexed before delete", uri)
+	}
+	if len(ws.Index.Definitions["gone"]) == 0 {
+		t.Fatal("expected definition before delete")
+	}
+
+	if err := os.Remove(tmplPath); err != nil {
+		t.Fatal(err)
+	}
+	ws.ReindexFile(tmplPath)
+
+	if _, ok := ws.Index.Trees[uri]; ok {
+		t.Fatalf("expected %q to be removed from tree index", uri)
+	}
+	if len(ws.Index.Definitions["gone"]) != 0 {
+		t.Fatalf("expected definition to be removed, got %#v", ws.Index.Definitions["gone"])
+	}
+}
+
 type keyer interface{ ~string }
 
 func keys[K keyer, V any](m map[K]V) []K {

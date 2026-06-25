@@ -221,17 +221,33 @@ export function activate(context: ExtensionContext): void {
               ? item.documentation
               : new MarkdownString(item.documentation.value);
           }
-          if (item.textEdit && "newText" in item.textEdit) {
+          const edit = item.textEdit;
+          if (edit && "newText" in edit) {
             if (item.insertTextFormat === InsertTextFormat.Snippet) {
-              ci.insertText = new SnippetString(item.textEdit.newText);
+              ci.insertText = new SnippetString(edit.newText);
             } else {
-              ci.insertText = item.textEdit.newText;
+              ci.insertText = edit.newText;
             }
-            const r = item.textEdit.range;
-            ci.range = new VRange(
-              new VPosition(r.start.line, r.start.character),
-              new VPosition(r.end.line, r.end.character)
-            );
+            if ("range" in edit) {
+              const r = edit.range;
+              ci.range = new VRange(
+                new VPosition(r.start.line, r.start.character),
+                new VPosition(r.end.line, r.end.character)
+              );
+            } else {
+              const insert = edit.insert;
+              const replace = edit.replace;
+              ci.range = {
+                inserting: new VRange(
+                  new VPosition(insert.start.line, insert.start.character),
+                  new VPosition(insert.end.line, insert.end.character)
+                ),
+                replacing: new VRange(
+                  new VPosition(replace.start.line, replace.start.character),
+                  new VPosition(replace.end.line, replace.end.character)
+                ),
+              };
+            }
           } else if (item.insertText) {
             if (item.insertTextFormat === InsertTextFormat.Snippet) {
               ci.insertText = new SnippetString(item.insertText);

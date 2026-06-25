@@ -98,7 +98,7 @@ func (s *Server) handleMessage(msg json.RawMessage) {
 func (s *Server) handleNotification(method string, params json.RawMessage) {
 	switch method {
 	case "initialized":
-		// no-op
+		s.RegisterFileWatchers()
 	case "textDocument/didOpen":
 		var p DidOpenTextDocumentParams
 		if json.Unmarshal(params, &p) == nil {

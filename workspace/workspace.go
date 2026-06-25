@@ -80,6 +80,7 @@ func (w *Workspace) ReindexFile(path string) {
 func (w *Workspace) indexFile(path string) {
 	data, err := os.ReadFile(path)
 	if err != nil {
+		w.Index.RemoveURI(PathToURI(path))
 		return
 	}
 	uri := PathToURI(path)

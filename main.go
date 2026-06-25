@@ -25,58 +25,52 @@ func main() {
 }
 
 type handler struct {
-	server       *lsp.Server
-	docs         *lsp.DocumentStore
-	ws           *workspace.Workspace
-	bindings     []goanalysis.TemplateBinding
-	initDone     chan struct{}
+	server   *lsp.Server
+	docs     *lsp.DocumentStore
+	ws       *workspace.Workspace
+	bindings []goanalysis.TemplateBinding
+	initDone chan struct{}
 }
 
 func (h *handler) Initialize(params lsp.InitializeParams) (lsp.InitializeResult, error) {
 	h.ws = workspace.NewWorkspace(params.RootURI)
 	h.initDone = make(chan struct{})
-	go func() {
-		h.ws.ScanTemplates()
-		h.bindings = goanalysis.ScanDirectory(h.ws.RootPath)
-		// Update workspace with custom function names and rescan
-		h.ws.ExtraFuncs = h.customFuncNames()
-		h.ws.RescanTemplates()
-		// Register file watchers for .go files
-		if h.server != nil {
-			h.server.RegisterFileWatchers()
-		}
-		// Debug: log binding info
-		if h.server != nil {
-			h.server.LogMessage(3, fmt.Sprintf("[debug] root=%s bindings=%d", h.ws.RootPath, len(h.bindings)))
-			for i, b := range h.bindings {
-				dt := "<nil>"
-				if b.DataType != nil {
-					dt = b.DataType.Name
-					if dt == "" {
-						dt = fmt.Sprintf("{fields:%d}", len(b.DataType.Fields))
-					}
+	h.ws.ScanTemplates()
+	h.bindings = goanalysis.ScanDirectory(h.ws.RootPath)
+	// Update workspace with custom function names and rescan
+	h.ws.ExtraFuncs = h.customFuncNames()
+	h.ws.RescanTemplates()
+	// Debug: log binding info
+	if h.server != nil {
+		h.server.LogMessage(3, fmt.Sprintf("[debug] root=%s bindings=%d", h.ws.RootPath, len(h.bindings)))
+		for i, b := range h.bindings {
+			dt := "<nil>"
+			if b.DataType != nil {
+				dt = b.DataType.Name
+				if dt == "" {
+					dt = fmt.Sprintf("{fields:%d}", len(b.DataType.Fields))
 				}
-				h.server.LogMessage(3, fmt.Sprintf("[debug] binding[%d] tmpl=%q data=%s files=%v handler=%s gofile=%s",
-					i, b.TemplateName, dt, b.ParsedFiles, b.HandlerName, b.GoFile))
 			}
+			h.server.LogMessage(3, fmt.Sprintf("[debug] binding[%d] tmpl=%q data=%s files=%v handler=%s gofile=%s",
+				i, b.TemplateName, dt, b.ParsedFiles, b.HandlerName, b.GoFile))
 		}
-		close(h.initDone)
-		// Re-publish diagnostics for all open documents now that bindings are ready
-		h.republishAllDiagnostics()
-	}()
+	}
+	close(h.initDone)
+	// Re-publish diagnostics for all open documents now that bindings are ready
+	h.republishAllDiagnostics()
 	return lsp.InitializeResult{
 		Capabilities: lsp.ServerCapabilities{
-			TextDocumentSync:       1,
-			HoverProvider:          true,
-			DefinitionProvider:     true,
-			CompletionProvider:     &lsp.CompletionOptions{TriggerCharacters: []string{".", "\""}},
-			DocumentSymbolProvider: true,
-			ReferencesProvider:     true,
-			DiagnosticProvider:      &lsp.DiagnosticOptions{InterFileDependencies: true, WorkspaceDiagnostics: false},
+			TextDocumentSync:           1,
+			HoverProvider:              true,
+			DefinitionProvider:         true,
+			CompletionProvider:         &lsp.CompletionOptions{TriggerCharacters: []string{".", "\""}},
+			DocumentSymbolProvider:     true,
+			ReferencesProvider:         true,
+			DiagnosticProvider:         &lsp.DiagnosticOptions{InterFileDependencies: true, WorkspaceDiagnostics: false},
 			DocumentFormattingProvider: true,
-			CodeActionProvider:      true,
-			WorkspaceSymbolProvider: true,
-			RenameProvider:          &lsp.RenameOptions{PrepareProvider: true},
+			CodeActionProvider:         true,
+			WorkspaceSymbolProvider:    true,
+			RenameProvider:             &lsp.RenameOptions{PrepareProvider: true},
 			SemanticTokensProvider: &lsp.SemanticTokensOptions{
 				Full: true,
 				Legend: lsp.SemanticTokensLegend{

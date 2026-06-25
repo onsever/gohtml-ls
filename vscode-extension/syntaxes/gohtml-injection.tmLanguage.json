@@ -1,6 +1,6 @@
 {
   "scopeName": "source.go.template.injection",
-  "injectionSelector": "L:text.html.basic, L:string.quoted.double.html",
+  "injectionSelector": "L:text.html.basic, L:string.quoted.double.html, L:string.quoted.single.html, L:source.js, L:source.css, L:string.quoted.double.js, L:string.quoted.single.js, L:string.quoted.double.css, L:string.quoted.single.css",
   "patterns": [
     { "include": "#comment-block" },
     { "include": "#action-block-define" },
@@ -9,6 +9,7 @@
     { "include": "#action-block-range" },
     { "include": "#action-block-with" },
     { "include": "#action-template-call" },
+    { "include": "#action-control" },
     { "include": "#action-end" },
     { "include": "#action-else" },
     { "include": "#action-generic" }
@@ -73,7 +74,7 @@
       "patterns": [{ "include": "#template-contents" }]
     },
     "action-block-with": {
-      "begin": "(\\{\\{-?)\\s*(with)\\b",
+      "begin": "(\\{\\{-?)\\s*(with|else\\s+with)\\b",
       "end": "(-?\\}\\})",
       "beginCaptures": {
         "1": { "name": "punctuation.section.embedded.begin.gotemplate" },
@@ -96,6 +97,14 @@
         "1": { "name": "punctuation.section.embedded.end.gotemplate" }
       },
       "patterns": [{ "include": "#template-contents" }]
+    },
+    "action-control": {
+      "match": "(\\{\\{-?)\\s*(break|continue)\\s*(-?\\}\\})",
+      "captures": {
+        "1": { "name": "punctuation.section.embedded.begin.gotemplate" },
+        "2": { "name": "keyword.control.gotemplate" },
+        "3": { "name": "punctuation.section.embedded.end.gotemplate" }
+      }
     },
     "action-end": {
       "match": "(\\{\\{-?)\\s*(end)\\s*(-?\\}\\})",
@@ -230,7 +239,7 @@
       "patterns": [{ "include": "#template-contents" }]
     },
     "function-call": {
-      "match": "\\b(?!(?:if|else|end|range|with|define|block|template|true|false|nil|and|call|html|index|js|len|not|or|print|printf|println|slice|urlquery|eq|ne|lt|le|gt|ge)\\b)([a-zA-Z_][a-zA-Z0-9_]*)\\b",
+      "match": "\\b(?!(?:if|else|end|range|with|define|block|template|break|continue|true|false|nil|and|call|html|index|js|len|not|or|print|printf|println|slice|urlquery|eq|ne|lt|le|gt|ge)\\b)([a-zA-Z_][a-zA-Z0-9_]*)\\b",
       "name": "entity.name.function.gotemplate"
     }
   }

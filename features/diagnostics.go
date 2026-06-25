@@ -1,14 +1,12 @@
 package features
 
 import (
-	"path/filepath"
 	"strings"
 	"text/template/parse"
 
 	"github.com/onsever/gohtml-ls/goanalysis"
 	"github.com/onsever/gohtml-ls/lsp"
 	tmpl "github.com/onsever/gohtml-ls/template"
-	"github.com/onsever/gohtml-ls/workspace"
 )
 
 // ComputeDiagnostics returns diagnostics for a parsed template.
@@ -40,11 +38,9 @@ func ComputeDiagnostics(pt *tmpl.ParsedTemplate, index *tmpl.TemplateIndex, bind
 		matched := matchBindingsForDiag(pt.URI, bindings)
 		if len(matched) == 0 {
 			// Fallback: use bindings not specifically bound to another template.
-			baseName := filepath.Base(workspace.URIToPath(pt.URI))
 			for _, b := range bindings {
 				if b.DataType != nil && len(b.DataType.Fields) > 0 {
-					if b.TemplateName == "" || b.TemplateName == baseName ||
-						strings.TrimSuffix(baseName, filepath.Ext(baseName)) == b.TemplateName {
+					if b.TemplateName == "" || bindingMatchesURI(b, pt.URI) {
 						matched = append(matched, b)
 					}
 				}
@@ -274,31 +270,12 @@ func resolvePipeDotType(pipe *parse.PipeNode, dataType *goanalysis.TypeInfo) *go
 // matchBindingsForDiag finds bindings matching a template URI.
 func matchBindingsForDiag(uri string, bindings []goanalysis.TemplateBinding) []goanalysis.TemplateBinding {
 	var matched []goanalysis.TemplateBinding
-	path := workspace.URIToPath(uri)
-	baseName := filepath.Base(path)
 
 	for _, b := range bindings {
 		if b.DataType == nil {
 			continue
 		}
-		if b.TemplateName == baseName {
-			matched = append(matched, b)
-			continue
-		}
-		parsedMatch := false
-		for _, pf := range b.ParsedFiles {
-			pfBase := filepath.Base(pf)
-			if pfBase == baseName || pf == baseName {
-				matched = append(matched, b)
-				parsedMatch = true
-				break
-			}
-		}
-		if parsedMatch {
-			continue
-		}
-		// Also match if the template name (without extension) matches
-		if strings.TrimSuffix(baseName, filepath.Ext(baseName)) == b.TemplateName {
+		if bindingMatchesURI(b, uri) {
 			matched = append(matched, b)
 		}
 	}

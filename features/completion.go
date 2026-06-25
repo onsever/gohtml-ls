@@ -1,13 +1,11 @@
 package features
 
 import (
-	"path/filepath"
 	"strings"
 
 	"github.com/onsever/gohtml-ls/goanalysis"
 	"github.com/onsever/gohtml-ls/lsp"
 	tmpl "github.com/onsever/gohtml-ls/template"
-	"github.com/onsever/gohtml-ls/workspace"
 )
 
 // Completion returns completion items at the given position.
@@ -86,10 +84,8 @@ func Completion(pt *tmpl.ParsedTemplate, pos lsp.Position, index *tmpl.TemplateI
 		// Only use bindings with no TemplateName (generic) or matching this file.
 		if len(result.Items) == 0 {
 			var generic []goanalysis.TemplateBinding
-			baseName := filepath.Base(workspace.URIToPath(pt.URI))
 			for _, b := range bindings {
-				if b.TemplateName == "" || b.TemplateName == baseName ||
-					strings.TrimSuffix(baseName, filepath.Ext(baseName)) == b.TemplateName {
+				if b.TemplateName == "" || bindingMatchesURI(b, pt.URI) {
 					generic = append(generic, b)
 				}
 			}
@@ -267,30 +263,8 @@ func appendFieldCompletions(items []lsp.CompletionItem, bindings []goanalysis.Te
 func matchBindings(uri string, bindings []goanalysis.TemplateBinding) []goanalysis.TemplateBinding {
 	var matched []goanalysis.TemplateBinding
 
-	// Get the filename from URI
-	path := workspace.URIToPath(uri)
-	baseName := filepath.Base(path)
-
 	for _, b := range bindings {
-		// Match by template name == base filename
-		if b.TemplateName == baseName {
-			matched = append(matched, b)
-			continue
-		}
-		// Match by parsed files containing this filename
-		parsedMatch := false
-		for _, pf := range b.ParsedFiles {
-			if filepath.Base(pf) == baseName || pf == baseName {
-				matched = append(matched, b)
-				parsedMatch = true
-				break
-			}
-		}
-		if parsedMatch {
-			continue
-		}
-		// Match by template name == filename without extension
-		if strings.TrimSuffix(baseName, filepath.Ext(baseName)) == b.TemplateName {
+		if bindingMatchesURI(b, uri) {
 			matched = append(matched, b)
 		}
 	}

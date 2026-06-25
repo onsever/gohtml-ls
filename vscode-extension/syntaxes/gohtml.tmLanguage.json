@@ -15,6 +15,7 @@
         { "include": "#action-block-range" },
         { "include": "#action-block-with" },
         { "include": "#action-template-call" },
+        { "include": "#action-control" },
         { "include": "#action-end" },
         { "include": "#action-else" },
         { "include": "#action-generic" }
@@ -87,7 +88,7 @@
       ]
     },
     "action-block-with": {
-      "begin": "(\\{\\{-?)\\s*(with)\\b",
+      "begin": "(\\{\\{-?)\\s*(with|else\\s+with)\\b",
       "end": "(-?\\}\\})",
       "beginCaptures": {
         "1": { "name": "punctuation.section.embedded.begin.gotemplate" },
@@ -114,6 +115,14 @@
       "patterns": [
         { "include": "#template-contents" }
       ]
+    },
+    "action-control": {
+      "match": "(\\{\\{-?)\\s*(break|continue)\\s*(-?\\}\\})",
+      "captures": {
+        "1": { "name": "punctuation.section.embedded.begin.gotemplate" },
+        "2": { "name": "keyword.control.gotemplate" },
+        "3": { "name": "punctuation.section.embedded.end.gotemplate" }
+      }
     },
     "action-end": {
       "match": "(\\{\\{-?)\\s*(end)\\s*(-?\\}\\})",
@@ -254,7 +263,7 @@
       ]
     },
     "function-call": {
-      "match": "\\b(?!(?:if|else|end|range|with|define|block|template|true|false|nil|and|call|html|index|js|len|not|or|print|printf|println|slice|urlquery|eq|ne|lt|le|gt|ge)\\b)([a-zA-Z_][a-zA-Z0-9_]*)\\b",
+      "match": "\\b(?!(?:if|else|end|range|with|define|block|template|break|continue|true|false|nil|and|call|html|index|js|len|not|or|print|printf|println|slice|urlquery|eq|ne|lt|le|gt|ge)\\b)([a-zA-Z_][a-zA-Z0-9_]*)\\b",
       "name": "entity.name.function.gotemplate"
     }
   }

@@ -9,20 +9,15 @@ import (
 
 // URIToPath converts a file:// URI to a local file path.
 func URIToPath(uri string) string {
-	if strings.HasPrefix(uri, "file:///") {
-		p := uri[len("file:///"):]
-		p, _ = url.PathUnescape(p)
-		// On Windows, paths start with drive letter
+	u, err := url.Parse(uri)
+	if err == nil && u.Scheme == "file" {
+		p := u.Path
 		if runtime.GOOS == "windows" {
+			if strings.HasPrefix(p, "/") && len(p) >= 3 && p[2] == ':' {
+				p = p[1:]
+			}
 			p = strings.ReplaceAll(p, "/", "\\")
-		} else {
-			p = "/" + p
 		}
-		return p
-	}
-	if strings.HasPrefix(uri, "file://") {
-		p := uri[len("file://"):]
-		p, _ = url.PathUnescape(p)
 		return p
 	}
 	return uri
@@ -32,9 +27,9 @@ func URIToPath(uri string) string {
 func PathToURI(path string) string {
 	path = filepath.ToSlash(path)
 	if !strings.HasPrefix(path, "/") {
-		return "file:///" + path
+		path = "/" + path
 	}
-	return "file://" + path
+	return (&url.URL{Scheme: "file", Path: path}).String()
 }
 
 // IsTemplateFile returns true if the file extension indicates a Go template.
